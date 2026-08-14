@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.1 (2026-08-15)
+
+- `watch-config.ps1`: retention policy — keeps only the newest 20 auto-* snapshots (`-MaxAutoSnapshots`); manual snapshots are never pruned
+- new `install.ps1`: registers watch-config auto-start via the per-user Startup folder (zero-window VBS wrapper, no admin needed); `-Uninstall` removes it; starts the watcher immediately
+- README: new "Installation & deployment" section (clone, optional auto-start, explicit note that the system-level watchdog is intentionally not installed)
+- system-level watchdog documented as optional (register manually if desired)
+
 ## v1.1.0 (2026-08-15)
 
 - `check-health.ps1`: every run appended to `<dsh>/logs/health-history.log` (timestamped PASS/FAIL + failed checks) so incidents get a timeline

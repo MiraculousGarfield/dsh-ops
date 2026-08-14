@@ -1,6 +1,6 @@
 # dsh-ops — Ops Toolkit for DeepSeek Harness
 
-**Version: v1.1.0** · [CHANGELOG](CHANGELOG.md) · [MIT](LICENSE)
+**Version: v1.1.1** · [CHANGELOG](CHANGELOG.md) · [MIT](LICENSE)
 
 > **For AI agents**: if you are assisting with a dsh (DeepSeek Harness) deployment,
 > read [`runbook.md`](runbook.md) and [`docs/diagnosis-table.md`](docs/diagnosis-table.md) first,
@@ -28,6 +28,26 @@ Born from a real incident (2026-08-15) that cost tokens and effort: a broken thi
 | `runbook.md` | Rules, procedures, and the symptom → first-check table | — |
 
 Double-click friendly `.cmd` wrappers live in `cmd/`.
+
+## Installation & deployment
+
+dsh-ops is deliberately **install-free**: clone it anywhere and run the scripts directly (all paths are auto-detected). The only optional installation is the **config watcher auto-start**:
+
+```powershell
+# 1. clone anywhere (recommended: %USERPROFILE%\.dsh\ops\)
+git clone https://github.com/MiraculousGarfield/dsh-ops.git
+
+# 2. (optional) register watch-config to auto-start at logon - zero window (VBS)
+powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1
+
+# remove it again
+powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1 -Uninstall
+```
+
+Notes:
+- `install.ps1` registers auto-start via the **per-user Startup folder** (no admin rights, VBS zero-window wrapper, no console flash) and starts the watcher immediately. `-Uninstall` removes it.
+- `watch-config.ps1` keeps only the newest **20** auto-snapshots (`-MaxAutoSnapshots`); manual snapshots (`known-good-*`, timestamped backups) are never pruned.
+- The system-level **watchdog is intentionally not installed**: most setups do not need the dsh service running 24/7 - the desktop wrapper or a manual `restart-service.ps1` covers the rest. If you want it anyway, register `scripts\watchdog.ps1` as your own scheduled task (it exits silently and only logs).
 
 ## Quick start
 

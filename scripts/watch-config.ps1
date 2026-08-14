@@ -1,11 +1,14 @@
 # watch-config.ps1 - auto-snapshot profile config whenever it changes (audit trail)
 # Polls the profile config files; on change (debounced), copies the standard set
 # into <dsh>/backups/auto-<stamp>/ and appends a line to <dsh>/logs/config-watch.log.
-# Run it persistently: at logon (scheduled task) or in a terminal. Ctrl+C to stop.
-# Usage: powershell -NoProfile -ExecutionPolicy Bypass -File watch-config.ps1 [-Profile web] [-DebounceSec 3]
+# Only the newest MaxAutoSnapshots auto-* snapshots are kept (retention policy);
+# manual snapshots (known-good-*, timestamped backups) are never touched.
+# Run it persistently: at logon (scheduled task via install.ps1) or in a terminal. Ctrl+C to stop.
+# Usage: powershell -NoProfile -ExecutionPolicy Bypass -File watch-config.ps1 [-Profile web] [-DebounceSec 3] [-MaxAutoSnapshots 20]
 param(
     [string]$Profile = 'web',
-    [int]$DebounceSec = 3
+    [int]$DebounceSec = 3,
+    [int]$MaxAutoSnapshots = 20
 )
 $ErrorActionPreference = 'SilentlyContinue'
 . (Join-Path $PSScriptRoot '..\lib\dsh-common.ps1')
@@ -57,4 +60,17 @@ while ($true) {
     $msg = "change(s): $($changed -join ', ') -> auto-$stamp"
     Add-Content -Path $audit -Value "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') [watch-config] $msg"
     Write-Host "snapshot $msg"
+
+    # retention: keep only the newest MaxAutoSnapshots auto-* snapshots
+    if ($MaxAutoSnapshots -gt 0) {
+        $auto = Get-ChildItem (Join-Path $dsh 'backups') -Directory -Filter 'auto-*' -ErrorAction SilentlyContinue |
+            Sort-Object Name
+        $excess = $auto.Count - $MaxAutoSnapshots
+        if ($excess -gt 0) {
+            $auto | Select-Object -First $excess | ForEach-Object {
+                Remove-Item $_.FullName -Recurse -Force
+                Add-Content -Path $audit -Value "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') [watch-config] pruned $($_.Name)"
+            }
+        }
+    }
 }

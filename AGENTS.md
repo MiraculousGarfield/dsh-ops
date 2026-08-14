@@ -15,8 +15,9 @@ runnable without dsh (plain PowerShell, zero tokens, zero AI).
 | `scripts/backup-config.ps1` | Snapshot profile config before changes |
 | `scripts/restore-snapshot.ps1` | Restore config from a snapshot |
 | `scripts/restart-service.ps1` | Start the dsh service if down |
-| `scripts/watchdog.ps1` | Silent watchdog for scheduled tasks |
-| `lib/dsh-common.ps1` | DSH home / launcher / node autodetection helpers |
+| `scripts/watchdog.ps1` | Silent watchdog for scheduled tasks (optional, not installed by default) |
+| `scripts/watch-config.ps1` | Auto-snapshot config on change (debounced, retention: newest 20 auto-snapshots) |
+| `install.ps1` | Register watch-config to auto-start at logon (zero-window VBS) / `-Uninstall` |
 | `cmd/*.cmd` | Double-click wrappers for the scripts |
 
 ## Golden rules
