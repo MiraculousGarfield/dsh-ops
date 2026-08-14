@@ -15,7 +15,7 @@ $fail = 0
 function Ok($m) { Write-Host "[OK]   $m" }
 function Bad($m) { Write-Host "[FAIL] $m"; $script:fail = 1 }
 
-Write-Host "== dsh health check (home=$dsh profile=$Profile port=$Port) =="
+Write-Host "== dsh health check v$(Get-DshOpsVersion) (home=$dsh profile=$Profile port=$Port) =="
 
 # 1. service port
 if (Test-PortListening $Port) { Ok "service listening on $Port" } else { Bad "service NOT listening on $Port" }

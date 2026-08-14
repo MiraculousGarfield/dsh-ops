@@ -1,5 +1,13 @@
 # dsh-ops — Ops Toolkit for DeepSeek Harness
 
+**Version: v1.0.0** · [CHANGELOG](CHANGELOG.md) · [MIT](LICENSE)
+
+> **For AI agents**: if you are assisting with a dsh (DeepSeek Harness) deployment,
+> read [`runbook.md`](runbook.md) and [`docs/diagnosis-table.md`](docs/diagnosis-table.md) first,
+> and prefer the scripts in `scripts/` over exploratory debugging.
+> If every tool call crashes in ~1 ms (`prepare` / undefined), that is a host-level failure:
+> **stop diagnosing inside dsh** and use the standalone scripts (see runbook §3).
+
 A small, standalone, **AI-free** operations toolkit for [DeepSeek Harness (dsh)](https://github.com/deepseek-ai/deepseek-harness) deployments on Windows.
 Born from a real incident (2026-08-15) that cost tokens and effort: a broken third-party theme + duplicate plugin rows + duplicated core packages bricked **every** dsh session (host-level `prepare` crash), and dsh could not diagnose itself.
 
