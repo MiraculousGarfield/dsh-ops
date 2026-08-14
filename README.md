@@ -1,6 +1,6 @@
 # dsh-ops — Ops Toolkit for DeepSeek Harness
 
-**Version: v1.0.0** · [CHANGELOG](CHANGELOG.md) · [MIT](LICENSE)
+**Version: v1.1.0** · [CHANGELOG](CHANGELOG.md) · [MIT](LICENSE)
 
 > **For AI agents**: if you are assisting with a dsh (DeepSeek Harness) deployment,
 > read [`runbook.md`](runbook.md) and [`docs/diagnosis-table.md`](docs/diagnosis-table.md) first,
@@ -17,11 +17,14 @@ Born from a real incident (2026-08-15) that cost tokens and effort: a broken thi
 
 | Tool | What it does | Cost |
 |---|---|---|
-| `check-health.ps1` | 7 checks: port, HTTP, expected package in boot roster, duplicate row ids in composed tree, core-package duplicates in profile `node_modules`, backup discipline | 0 tokens |
+| `check-health.ps1` | 8 checks: port, HTTP, expected package in boot roster, duplicate row ids in composed tree, core-package duplicates, backup discipline, static lint (user packages whose `main` references browser globals). Every run is appended to `<dsh>/logs/health-history.log` | 0 tokens |
 | `backup-config.ps1` | Snapshot profile config (cordis.yml / cordis.patch.yml / package.json / pnpm-workspace.yaml / settings.yaml) + packages list into `<dsh>/backups/<stamp>/` | 0 tokens |
 | `restore-snapshot.ps1` | Restore config from a snapshot (with confirmation) | 0 tokens |
-| `restart-service.ps1` | Start the dsh service if it is down (auto-detects the launcher) | 0 tokens |
-| `watchdog.ps1` | Silent watchdog for scheduled tasks; restarts the service and logs to `<dsh>/backups/watchdog.log` | 0 tokens |
+| `list-snapshots.ps1` | List snapshots with file counts and creation times | 0 tokens |
+| `diff-snapshot.ps1` | Diff config between two snapshots (audit what changed) | 0 tokens |
+| `restart-service.ps1` | Start the dsh service if down; verifies port **and** HTTP 200 | 0 tokens |
+| `watchdog.ps1` | Silent watchdog for scheduled tasks; restarts only if the config is healthy (2 consecutive failed restarts stop retrying and tell you to restore a snapshot) | 0 tokens |
+| `watch-config.ps1` | Auto-snapshot config whenever it changes (poll + debounce) + audit log `<dsh>/logs/config-watch.log` | 0 tokens |
 | `runbook.md` | Rules, procedures, and the symptom → first-check table | — |
 
 Double-click friendly `.cmd` wrappers live in `cmd/`.

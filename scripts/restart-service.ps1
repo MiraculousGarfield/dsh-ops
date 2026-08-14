@@ -29,9 +29,22 @@ $deadline = (Get-Date).AddSeconds($TimeoutSec)
 while ((Get-Date) -lt $deadline) {
     Start-Sleep -Milliseconds 500
     if (Test-PortListening $Port) {
-        Write-Host 'service is up'
-        exit 0
+        break
     }
 }
-Write-Host 'service did not become ready in time'
+if (-not (Test-PortListening $Port)) {
+    Write-Host 'service did not listen in time'
+    exit 1
+}
+
+# port is up -> verify HTTP 200 (a listening port alone is not health)
+$httpDeadline = (Get-Date).AddSeconds(20)
+while ((Get-Date) -lt $httpDeadline) {
+    if (Get-BootRoster "http://127.0.0.1:$Port") {
+        Write-Host 'service is up (HTTP OK)'
+        exit 0
+    }
+    Start-Sleep -Milliseconds 500
+}
+Write-Host 'port is up but HTTP not responding - config may be broken (run check-health.ps1)'
 exit 1

@@ -11,9 +11,10 @@ $ErrorActionPreference = 'SilentlyContinue'
 $dsh = Get-DshHome
 $url = "http://127.0.0.1:$Port"
 $fail = 0
+$failItems = New-Object System.Collections.Generic.List[string]
 
 function Ok($m) { Write-Host "[OK]   $m" }
-function Bad($m) { Write-Host "[FAIL] $m"; $script:fail = 1 }
+function Bad($m) { Write-Host "[FAIL] $m"; $script:fail = 1; [void]$script:failItems.Add($m) }
 
 Write-Host "== dsh health check v$(Get-DshOpsVersion) (home=$dsh profile=$Profile port=$Port) =="
 
@@ -60,6 +61,53 @@ if ($dupCore) {
 # 6. backup discipline
 $n = Get-SnapshotCount
 if ($n -gt 0) { Ok "backup dir exists ($n snapshot(s))" } else { Bad 'no snapshots yet - run backup-config.ps1 before changes' }
+
+# 7. static lint: user packages whose server entry references browser globals
+#    (the malformed-theme class: "main" pointing at a browser script -> window is not defined)
+$scanRoots = @()
+$pkgsDir = Join-Path $dsh 'packages'
+if (Test-Path $pkgsDir) {
+    $scanRoots += (Get-ChildItem $pkgsDir -Directory -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })
+}
+$nm = Join-Path $dsh "profiles\$Profile\node_modules"
+if (Test-Path $nm) {
+    foreach ($d in (Get-ChildItem $nm -Directory -ErrorAction SilentlyContinue)) {
+        if ($d.Name -like '@*') {
+            foreach ($s in (Get-ChildItem $d.FullName -Directory -ErrorAction SilentlyContinue)) {
+                if ($s.Name -ne '@deepseek-ai') { $scanRoots += $s.FullName }
+            }
+        } elseif ($d.Name -notin @('.pnpm', '.bin')) {
+            $scanRoots += $d.FullName
+        }
+    }
+}
+$lintBads = @()
+foreach ($root in $scanRoots) {
+    $pj = Join-Path $root 'package.json'
+    if (-not (Test-Path $pj)) { continue }
+    try { $pkg = Get-Content $pj -Raw | ConvertFrom-Json } catch { continue }
+    if (-not $pkg.main) { continue }
+    $mainPath = Join-Path $root ($pkg.main -replace '\\', '/')
+    if (-not (Test-Path $mainPath)) { continue }
+    try {
+        $text = [System.IO.File]::ReadAllText($mainPath, [System.Text.Encoding]::UTF8)
+        $head = $text.Substring(0, [Math]::Min(3000, $text.Length))
+        if ($head -match 'window\.|document\.') { $lintBads += (Split-Path $root -Leaf) }
+    } catch { }
+}
+if ($lintBads.Count) {
+    $lintBads | ForEach-Object { Bad "package '$_' has main referencing browser globals (window/document)" }
+} else {
+    Ok 'no user package main references browser globals'
+}
+
+# history log: every run is recorded with timestamp so incidents get a timeline
+$logsDir = Join-Path $dsh 'logs'
+if (-not (Test-Path $logsDir)) { New-Item -ItemType Directory -Force -Path $logsDir | Out-Null }
+$stamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+$status = if ($fail -eq 0) { 'PASS' } else { 'FAIL' }
+$detail = if ($failItems.Count) { ($failItems -join '; ') } else { '-' }
+Add-Content -Path (Join-Path $logsDir 'health-history.log') -Value "$stamp | $status | $detail"
 
 Write-Host ''
 if ($fail -eq 0) { Write-Host 'RESULT: ALL HEALTHY' } else { Write-Host 'RESULT: ISSUES FOUND - see runbook.md' }
