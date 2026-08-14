@@ -1,6 +1,6 @@
 # dsh-ops — Ops Toolkit for DeepSeek Harness
 
-**Version: v1.1.1** · [CHANGELOG](CHANGELOG.md) · [MIT](LICENSE)
+**Version: v1.1.2** · [CHANGELOG](CHANGELOG.md) · [MIT](LICENSE)
 
 > **For AI agents**: if you are assisting with a dsh (DeepSeek Harness) deployment,
 > read [`runbook.md`](runbook.md) and [`docs/diagnosis-table.md`](docs/diagnosis-table.md) first,
@@ -56,7 +56,7 @@ Notes:
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts\check-health.ps1
 
 # with a custom profile / port / expected theme package
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\check-health.ps1 -Profile web -Port 3080 -ExpectTheme dsh-theme-space
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\check-health.ps1 -Profile web -Port 3080 -ExpectTheme <your-theme-package>
 
 # back up before ANY config change
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts\backup-config.ps1

@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.2 (2026-08-15)
+
+- **privacy fix**: removed the machine-specific generated `scripts/watch-config.vbs` from the repository (it contained an absolute user path); history rewritten to purge it
+- `install.ps1` now writes the VBS wrapper **only** into the per-user Startup folder, never into the repo
+- `.gitignore` for generated artifacts; README `-ExpectTheme` example neutralized to a generic placeholder
+
 ## v1.1.1 (2026-08-15)
 
 - `watch-config.ps1`: retention policy — keeps only the newest 20 auto-* snapshots (`-MaxAutoSnapshots`); manual snapshots are never pruned

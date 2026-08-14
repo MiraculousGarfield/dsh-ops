@@ -43,15 +43,14 @@ if (-not (Test-Path $psPath)) {
     exit 2
 }
 
-# zero-window VBS wrapper (window style 0)
-$vbsPath = Join-Path $target 'scripts\watch-config.vbs'
+# zero-window VBS wrapper (window style 0), written ONLY to the per-user Startup
+# folder - never into the repo (generated files contain machine-specific paths)
+$vbsPath = Join-Path $startupDir $linkName
 $vbs = "Set s = CreateObject(""WScript.Shell"")" + "`r`n" +
     "s.Run ""powershell.exe -NoProfile -ExecutionPolicy Bypass -File """"$psPath"""" -Profile $Profile"", 0, False"
 Set-Content -Path $vbsPath -Value $vbs -Encoding ASCII
 
-# register via the per-user Startup folder (no admin needed, no flash)
-Copy-Item $vbsPath $linkPath -Force
-Write-Host "auto-start registered (Startup folder): $linkPath"
+Write-Host "auto-start registered (Startup folder): $vbsPath"
 
 # start it right away, hidden
 $wsh = New-Object -ComObject WScript.Shell

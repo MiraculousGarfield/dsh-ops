@@ -1,0 +1,2 @@
+# generated artifacts - never commit these (they contain machine-specific absolute paths)
+scripts/watch-config.vbs
