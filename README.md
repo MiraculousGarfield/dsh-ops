@@ -1,7 +1,7 @@
 # dsh-ops — Ops Toolkit for DeepSeek Harness
 
 A small, standalone, **AI-free** operations toolkit for [DeepSeek Harness (dsh)](https://github.com/deepseek-ai/deepseek-harness) deployments on Windows.
-Born from a real incident (2026-08-15) that cost hours and lots of tokens: a broken third-party theme + duplicate plugin rows + duplicated core packages bricked **every** dsh session (host-level `prepare` crash), and dsh could not diagnose itself.
+Born from a real incident (2026-08-15) that cost tokens and effort: a broken third-party theme + duplicate plugin rows + duplicated core packages bricked **every** dsh session (host-level `prepare` crash), and dsh could not diagnose itself.
 
 **Key insight**: host-level failures take down every dsh session, so the tooling must be runnable *without* dsh — plain PowerShell, zero tokens, zero AI.
 

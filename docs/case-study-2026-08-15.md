@@ -32,7 +32,7 @@
 - Replaced the broken theme with a working one; removed the bad package from `package.json`.
 - Ran `pnpm install` in the profile to prune the duplicated core packages.
 - Archived the corrupt session.
-- Total cost: several hours and a large amount of tokens — mostly because every attempt to diagnose
+- Total cost: roughly half an hour of external tooling work, plus a large amount of tokens — mostly because every attempt to diagnose
   inside dsh crashed instantly, so diagnosis had to be done externally.
 
 ## Lessons → what this kit automates
