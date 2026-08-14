@@ -1,6 +1,6 @@
 # dsh-common.ps1 - shared helpers for dsh-ops (Windows PowerShell 5.1 compatible, ASCII only)
 
-function Get-DshOpsVersion { return '1.1.2' }
+function Get-DshOpsVersion { return '1.1.3' }
 
 function Get-DshHome {
     if ($env:DSH_HOME) { return $env:DSH_HOME }

@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.3 (2026-08-15)
+
+- i18n: README 改为中文为主（`README.md`），新增英文镜像 `README.en.md`（与生态清单一致的双语文案）
+- PR #3 / Issue #248 正文改为中文（清单维护者均为中文社区）
+
 ## v1.1.2 (2026-08-15)
 
 - **privacy fix**: removed the machine-specific generated `scripts/watch-config.vbs` from the repository (it contained an absolute user path); history rewritten to purge it
