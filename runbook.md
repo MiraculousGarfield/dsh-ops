@@ -20,6 +20,13 @@
    **Never point `main` at a browser script** (`window is not defined` → server crashes on boot).
 5. **After any config change, before restarting the service**: run `check-health.ps1`; restart only when green.
 6. **Back up before any change**: `backup-config.ps1` (snapshot into `<dsh>/backups/<stamp>/`).
+7. **Once a bundle is registered** (`dsh.profile.bundles` in `package.json`), **never delete the package
+   directory from node_modules while the bundle line remains.** A registered-but-missing bundle makes the
+   service refuse to boot (`cannot resolve profile bundle`). Remove the bundle line / dependency first,
+   then the package — never the reverse.
+8. **After every confirmed-healthy state, refresh the known-good snapshot**:
+   `backup-config.ps1 -Name known-good-<date>`. Restoring an outdated known-good silently drops every
+   later correct change (the 2026-08-16 lesson: restore lost a working theme + Tailscale config).
 
 ## 2. Standard procedures
 
@@ -32,12 +39,11 @@
 6. Restart the service and verify
 
 ### Recover (5-minute plan)
-1. `check-health.ps1` — see which check is red
-2. Compare against a known-good snapshot (`<dsh>/backups/known-good-*`):
-   `restore-snapshot.ps1 -Snapshot <name>`
+1. `restore-snapshot.ps1 -Snapshot known-good-<latest>` — restore the most recent verified snapshot
+2. Restart the service (`restart-service.ps1`) and run `check-health.ps1`
 3. If core packages were duplicated inside the profile `node_modules`: run `pnpm install` in the profile
    dir to prune (it follows `package.json`), or remove the extra entries
-4. Restart the service, re-run `check-health.ps1` until green
+4. Repeat until green; when green, refresh the known-good snapshot (iron rule 8)
 
 ## 3. Escape hatch: when EVERY dsh session is dead (0 tokens)
 
