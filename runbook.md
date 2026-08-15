@@ -39,11 +39,16 @@
 6. Restart the service and verify
 
 ### Recover (5-minute plan)
-1. `restore-snapshot.ps1 -Snapshot known-good-<latest>` — restore the most recent verified snapshot
-2. Restart the service (`restart-service.ps1`) and run `check-health.ps1`
+1. `cmd\fix-service.cmd` — **smart one-click rollback (preferred)**: restores snapshots
+   newest-first (auto-* from watch-config, then known-good-auto, then dated known-good),
+   restarting + health-checking each one, stopping at the first green state — this keeps
+   as much recent work as possible instead of dropping everything since the last green run.
+2. `cmd\restore-known-good.cmd` — fast fallback straight to the latest green baseline
+   (drops intermediate changes; use when you know you just broke it).
 3. If core packages were duplicated inside the profile `node_modules`: run `pnpm install` in the profile
    dir to prune (it follows `package.json`), or remove the extra entries
-4. Repeat until green; when green, refresh the known-good snapshot (iron rule 8)
+4. Repeat until green; when green, the check-health auto-refresh keeps known-good-auto current
+   (no manual snapshot step needed).
 
 ## 3. Escape hatch: when EVERY dsh session is dead (0 tokens)
 
