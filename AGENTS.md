@@ -19,6 +19,7 @@ runnable without dsh (plain PowerShell, zero tokens, zero AI).
 | `scripts/watch-config.ps1` | Auto-snapshot config on change (debounced, retention: newest 20 auto-snapshots) |
 | `install.ps1` | Register watch-config to auto-start at logon (zero-window VBS) / `-Uninstall` |
 | `cmd/*.cmd` | Double-click wrappers for the scripts |
+| `plugin/` | **dsh-ops-health** — optional dsh plugin shell: sidebar health-check button → `/ops/health` HTTP route (host half `lib/index.js`) → hidden `check-health.ps1` run → report card (browser half `lib/client.js`). Route bypasses the tool registry on purpose; the standalone scripts remain the escape hatch for process-level failure. `plugin/scripts/check-health.ps1` is a copy — edit the root one and sync |
 
 ## Golden rules
 

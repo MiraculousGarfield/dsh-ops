@@ -33,6 +33,24 @@
 
 双击友好的 `.cmd` 入口在 `cmd/` 目录。
 
+## DSH 插件：dsh-ops-health（独立仓库）
+
+浏览器/桌面壳里点一下就能体检，**不用切 PowerShell**。插件源码在独立仓库
+[`MiraculousGarfield/dsh-ops-health`](https://github.com/MiraculousGarfield/dsh-ops-health)
+（本仓库不再维护 `plugin/` 副本，避免双份漂移）。
+
+- 侧边栏「🩺 健康检查」按钮 → 纯 HTTP 路由 `/ops/health` → 隐藏窗口跑
+  `check-health.ps1` → 结构化报告卡片（✓/✗ 逐项 + 总结 + 处置提示）
+- 按钮配色**跟随主题**：取 `--dsw-alias-brand-primary`（DSH 主题品牌色，皮肤
+  覆盖时自动跟随皮肤），不依赖主题服务，任何主题/皮肤下都协调
+- 路由直接注册在 webServer 上，**不经过工具注册表**：agent 工具调用崩了
+  （宿主级故障以外的形态）按钮仍可用；进程级故障时按钮同样不可用，
+  兜底仍是本仓库的独立脚本
+- **本机安装姿势（手册铁律）**：包复制到 `<profile>\node_modules\dsh-ops-health`，
+  在 cordis.patch.yml 插入 `- insert: [{id: ops-health, name: 'dsh-ops-health'}]`，
+  重启服务生效。**不要用 github 依赖 + bundle 注册**：bundle 一旦注册就绝不能
+  删包目录（`cannot resolve profile bundle` 会让服务拒绝启动）
+
 ## 安装与部署
 
 dsh-ops 刻意**免安装**：克隆到任意位置直接运行（所有路径自动探测）。唯一可选的安装是
