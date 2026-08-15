@@ -1,5 +1,32 @@
 # Changelog
 
+## v1.2.0 (2026-08-16)
+
+- **new `fix-service.ps1` / `fix-service.cmd`**: smart one-click recovery — restores
+  snapshots newest-first (`auto-*` → `known-good-auto` → dated known-good), restarting and
+  health-checking each one, stopping at the first green state. Preserves as much recent work
+  as possible; snapshots the current (broken) state to `pre-fix-*` before touching anything
+- **`check-health.ps1` auto-refresh**: every all-green run now refreshes the
+  `backups/known-good-auto/` snapshot (with `updated-at.txt`), so the recovery baseline is
+  always current without manual steps
+- runbook: two new iron rules from the 2026-08-16 incident — never delete a registered
+  bundle's package directory (`cannot resolve profile bundle` refuses to boot), and keep the
+  known-good snapshot fresh; recovery flow rewritten around the smart rollback
+- new `audit-ops.ps1`: full-project audit (PS syntax, cmd→ps1 references, GBK garble risk
+  in console output, secret patterns, cross-copy drift of `check-health.ps1`)
+- new `scripts/fix-service.ps1` shared with the local ops kit; plugin split out to the
+  standalone repo `dsh-ops-health` (see README)
+
+## v1.1.4 (2026-08-16)
+
+- plugin shell `dsh-ops-health` spun out into its own repository
+  (`github:MiraculousGarfield/dsh-ops-health`): sidebar health-check button → plain HTTP
+  route `/ops/health` (independent of the tool registry) → hidden `check-health.ps1` run →
+  structured report card, theme-following colors. The local `plugin/` copy was removed to
+  avoid double maintenance
+- README/AGENTS document the plugin, its install posture, and the github-dependency+bundle
+  pitfall (a registered bundle must never lose its package directory)
+
 ## v1.1.3 (2026-08-15)
 
 - i18n: README 改为中文为主（`README.md`），新增英文镜像 `README.en.md`（与生态清单一致的双语文案）

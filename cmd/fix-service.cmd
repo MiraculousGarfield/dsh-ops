@@ -7,6 +7,6 @@ echo restarting and health-checking each one, until
 echo a green state is found (keeps your latest work).
 echo ============================================
 echo.
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\fix-service.ps1"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\scripts\fix-service.ps1"
 echo.
 pause

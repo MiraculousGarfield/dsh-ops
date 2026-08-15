@@ -1,6 +1,6 @@
 # dsh-ops — DeepSeek Harness 运维工具箱
 
-**版本：v1.1.3** · [更新日志](CHANGELOG.md) · [MIT](LICENSE) · [English](README.en.md)
+**版本：v1.2.0** · [更新日志](CHANGELOG.md) · [MIT](LICENSE) · [English](README.en.md)
 
 > **给 AI 代理**：如果你正在协助维护 dsh（DeepSeek Harness）部署，请先读
 > [`runbook.md`](runbook.md) 和 [`docs/diagnosis-table.md`](docs/diagnosis-table.md)，
@@ -21,15 +21,28 @@
 
 | 工具 | 作用 | 成本 |
 |---|---|---|
-| `check-health.ps1` | 8 项体检：端口、HTTP、启动清单中的期望包、组合树重复行、核心包双份、备份纪律、静态 lint（`main` 引用浏览器全局的包）。每次运行都会追加到 `<dsh>/logs/health-history.log` | 0 token |
+| `fix-service.ps1` | **智能一键修复**：从最新快照往回逐个还原 + 自动重启 + 自动体检，找到第一个健康状态停下（保住中间改动）；动手前先把现场存为 `pre-fix-*` | 0 token |
+| `restore-known-good.cmd` | 快速回退到最近一次全绿快照（`known-good-auto`，由每次全绿体检自动刷新） | 0 token |
+| `check-health.ps1` | 8 项体检：端口、HTTP、启动清单中的期望包、组合树重复行、核心包双份、备份纪律、静态 lint（`main` 引用浏览器全局的包）。每次运行追加到 `<dsh>/logs/health-history.log`；**全绿时自动刷新 known-good-auto 快照** | 0 token |
 | `backup-config.ps1` | 快照 profile 配置（cordis.yml / cordis.patch.yml / package.json / pnpm-workspace.yaml / settings.yaml）+ 包清单 → `<dsh>/backups/<时间戳>/` | 0 token |
 | `restore-snapshot.ps1` | 从快照还原配置（带确认） | 0 token |
 | `list-snapshots.ps1` | 列出快照（文件数、创建时间） | 0 token |
 | `diff-snapshot.ps1` | 对比两个快照的配置差异（审计"改了什么"） | 0 token |
 | `restart-service.ps1` | 服务未运行则启动；验证端口**和** HTTP 200 | 0 token |
 | `watchdog.ps1` | 计划任务用静默看门狗；配置健康才重启（连续 2 次失败停止重试并提示还原快照） | 0 token |
-| `watch-config.ps1` | 配置一变就自动快照（轮询+防抖）+ 审计日志 `<dsh>/logs/config-watch.log` | 0 token |
+| `watch-config.ps1` | 配置一变就自动快照（轮询+防抖，留 20 份）+ 审计日志 `<dsh>/logs/config-watch.log` | 0 token |
+| `audit-ops.ps1` | 项目自检：PS 语法 / cmd 引用完整性 / 控制台中文乱码风险 / 密钥模式 / check-health 副本漂移 | 0 token |
 | `runbook.md` | 铁律、标准流程、症状→排查对照表 | — |
+
+双击友好的 `.cmd` 入口在 `cmd/` 目录。
+
+## 快照体系（三层防线）
+
+| 层 | 谁在更新 | 用途 |
+|---|---|---|
+| `auto-<时间戳>` | `watch-config.ps1` 每次配置变动自动拍（留 20 份） | 逐级回退的原料 |
+| `known-good-auto` | `check-health.ps1` 每次全绿自动刷新 | 快速回退的安全基准 |
+| `known-good-<日期>` | 手动（`backup-config.ps1 -Name`） | 人工确认的里程碑 |
 
 双击友好的 `.cmd` 入口在 `cmd/` 目录。
 

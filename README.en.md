@@ -1,6 +1,6 @@
 # dsh-ops — Ops Toolkit for DeepSeek Harness
 
-**Version: v1.1.3** · [CHANGELOG](CHANGELOG.md) · [MIT](LICENSE) · [中文](README.md)
+**Version: v1.2.0** · [CHANGELOG](CHANGELOG.md) · [MIT](LICENSE) · [中文](README.md)
 
 > **For AI agents**: if you are assisting with a dsh (DeepSeek Harness) deployment,
 > read [`runbook.md`](runbook.md) and [`docs/diagnosis-table.md`](docs/diagnosis-table.md) first,
@@ -17,17 +17,33 @@ Born from a real incident (2026-08-15) that cost tokens and effort: a broken thi
 
 | Tool | What it does | Cost |
 |---|---|---|
-| `check-health.ps1` | 8 checks: port, HTTP, expected package in boot roster, duplicate row ids in composed tree, core-package duplicates, backup discipline, static lint (user packages whose `main` references browser globals). Every run is appended to `<dsh>/logs/health-history.log` | 0 tokens |
+| `fix-service.ps1` | **Smart one-click recovery**: restores snapshots newest-first (auto-* → known-good-auto → dated known-good), restarting + health-checking each one, stopping at the first green state (keeps your recent work); snapshots the current broken state to `pre-fix-*` first | 0 tokens |
+| `restore-known-good.cmd` | Fast fallback straight to the latest green baseline (`known-good-auto`, auto-refreshed by every green check) | 0 tokens |
+| `check-health.ps1` | 8 checks: port, HTTP, expected package in boot roster, duplicate row ids in composed tree, core-package duplicates, backup discipline, static lint (user packages whose `main` references browser globals). Every run is appended to `<dsh>/logs/health-history.log`; **all-green runs auto-refresh the `known-good-auto` snapshot** | 0 tokens |
 | `backup-config.ps1` | Snapshot profile config (cordis.yml / cordis.patch.yml / package.json / pnpm-workspace.yaml / settings.yaml) + packages list into `<dsh>/backups/<stamp>/` | 0 tokens |
 | `restore-snapshot.ps1` | Restore config from a snapshot (with confirmation) | 0 tokens |
 | `list-snapshots.ps1` | List snapshots with file counts and creation times | 0 tokens |
 | `diff-snapshot.ps1` | Diff config between two snapshots (audit what changed) | 0 tokens |
 | `restart-service.ps1` | Start the dsh service if down; verifies port **and** HTTP 200 | 0 tokens |
 | `watchdog.ps1` | Silent watchdog for scheduled tasks; restarts only if the config is healthy (2 consecutive failed restarts stop retrying and tell you to restore a snapshot) | 0 tokens |
-| `watch-config.ps1` | Auto-snapshot config whenever it changes (poll + debounce) + audit log `<dsh>/logs/config-watch.log` | 0 tokens |
+| `watch-config.ps1` | Auto-snapshot config whenever it changes (poll + debounce, keeps 20) + audit log `<dsh>/logs/config-watch.log` | 0 tokens |
+| `audit-ops.ps1` | Project self-audit: PS syntax / cmd reference integrity / GBK-garble risk in console output / secret patterns / check-health copy drift | 0 tokens |
 | `runbook.md` | Rules, procedures, and the symptom → first-check table | — |
 
 Double-click friendly `.cmd` wrappers live in `cmd/`.
+
+A browser-side plugin shell (**dsh-ops-health**) lives in its own repo:
+[`MiraculousGarfield/dsh-ops-health`](https://github.com/MiraculousGarfield/dsh-ops-health) —
+sidebar button → plain HTTP route `/ops/health` (independent of the tool registry) → hidden
+`check-health.ps1` run → structured report card with theme-following colors.
+
+## Snapshot tiers (three layers)
+
+| Tier | Updated by | Purpose |
+|---|---|---|
+| `auto-<stamp>` | `watch-config.ps1` on every config change (keeps 20) | raw material for step-by-step rollback |
+| `known-good-auto` | `check-health.ps1` on every all-green run | fast-fallback safety baseline |
+| `known-good-<date>` | manual (`backup-config.ps1 -Name`) | human-confirmed milestones |
 
 ## Installation & deployment
 
