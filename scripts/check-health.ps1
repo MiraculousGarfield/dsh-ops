@@ -109,6 +109,35 @@ $status = if ($fail -eq 0) { 'PASS' } else { 'FAIL' }
 $detail = if ($failItems.Count) { ($failItems -join '; ') } else { '-' }
 Add-Content -Path (Join-Path $logsDir 'health-history.log') -Value "$stamp | $status | $detail"
 
+# auto-refresh the known-good snapshot whenever everything is green:
+# a green run is by definition a verified state, so this keeps the restore
+# baseline always current without any manual step. Written to a fixed
+# known-good-auto/ dir; manual dated snapshots (known-good-<date>) stay.
+if ($fail -eq 0) {
+    $auto = Join-Path $dsh 'backups\known-good-auto'
+    try {
+        New-Item -ItemType Directory -Force -Path $auto | Out-Null
+        foreach ($rel in @(
+            "profiles\$Profile\cordis.yml",
+            "profiles\$Profile\cordis.patch.yml",
+            "profiles\$Profile\package.json",
+            "profiles\$Profile\pnpm-workspace.yaml",
+            'settings.yaml'
+        )) {
+            $src = Join-Path $dsh $rel
+            if (Test-Path $src) { Copy-Item $src $auto -Force }
+        }
+        [System.IO.File]::WriteAllText(
+            (Join-Path $auto 'updated-at.txt'),
+            (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'),
+            [System.Text.UTF8Encoding]::new($false)
+        )
+        Write-Host "[auto] known-good snapshot refreshed (all green)"
+    } catch {
+        Write-Host "[auto] known-good refresh failed: $($_.Exception.Message)"
+    }
+}
+
 Write-Host ''
 if ($fail -eq 0) { Write-Host 'RESULT: ALL HEALTHY' } else { Write-Host 'RESULT: ISSUES FOUND - see runbook.md' }
 exit $fail
