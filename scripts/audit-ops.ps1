@@ -1,10 +1,14 @@
-﻿# Full audit of the ops project: syntax, references, garbled-output risk, secrets, drift.
-$ErrorActionPreference = 'SilentlyContinue'
-$roots = @(
-    'C:\Users\Guo Zifan\Desktop\Deepseek Harness\运维工具',
-    'C:\Users\Guo Zifan\Desktop\Deepseek Harness\dsh-ops',
-    'C:\Users\Guo Zifan\Desktop\Deepseek Harness\dsh-ops-health'
+# audit-ops.ps1 - full project audit: syntax, references, garbled-output risk,
+# secrets, cross-copy drift. No machine-specific paths are embedded: it audits
+# this repo's own tree (derived from $PSScriptRoot), plus any extra roots you
+# pass explicitly, e.g.:
+#   powershell -NoProfile -File audit-ops.ps1 -Roots 'C:\path\to\ops-kit','C:\path\to\dsh-ops-health'
+param(
+    [string[]]$Roots = @()
 )
+$ErrorActionPreference = 'SilentlyContinue'
+$repoRoot = Split-Path $PSScriptRoot -Parent
+$roots = @($repoRoot) + $Roots
 $issues = @()
 
 # A. PS syntax
@@ -104,12 +108,18 @@ foreach ($f in @($allPs1) + @($allCmd)) {
 Write-Host ''
 Write-Host '=== F. check-health.ps1 copies ==='
 $hashes = @{}
+# this repo's copy + the installed plugin copy under the dsh home (auto-detected)
 $paths = @(
-    'C:\Users\Guo Zifan\Desktop\Deepseek Harness\运维工具\scripts\check-health.ps1',
-    'C:\Users\Guo Zifan\Desktop\Deepseek Harness\dsh-ops\scripts\check-health.ps1',
-    'C:\Users\Guo Zifan\Desktop\Deepseek Harness\dsh-ops-health\scripts\check-health.ps1',
-    "$env:USERPROFILE\.dsh\profiles\node_modules\dsh-ops-health\scripts\check-health.ps1"
+    (Join-Path $repoRoot 'scripts\check-health.ps1')
 )
+if ($env:USERPROFILE) {
+    $paths += "$env:USERPROFILE\.dsh\profiles\node_modules\dsh-ops-health\scripts\check-health.ps1"
+}
+# any explicitly passed extra roots that also carry scripts\check-health.ps1
+foreach ($r in $Roots) {
+    $cand = Join-Path $r 'scripts\check-health.ps1'
+    if (Test-Path $cand) { $paths += $cand }
+}
 foreach ($p in $paths) {
     if (Test-Path $p) {
         $h = (Get-FileHash $p -Algorithm SHA256).Hash.Substring(0, 12)
