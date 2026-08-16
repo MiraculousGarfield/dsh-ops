@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.2.1 (2026-08-16)
+
+- desktop-app watchdog integration (local deployment): after 3 consecutive failed
+  service restarts the App shows a prominent offline page + native dialog offering
+  **one-click repair** — it spawns `fix-service.cmd` (this repo) and auto-reloads the
+  UI once the service is back, instead of silently sitting on a dead page
+- `runbook.md`: noted the App entry point for the escape hatch
+
 ## v1.2.0 (2026-08-16)
 
 - **new `fix-service.ps1` / `fix-service.cmd`**: smart one-click recovery — restores

@@ -43,6 +43,8 @@
    newest-first (auto-* from watch-config, then known-good-auto, then dated known-good),
    restarting + health-checking each one, stopping at the first green state — this keeps
    as much recent work as possible instead of dropping everything since the last green run.
+   The desktop app's watchdog also surfaces this as a dialog after 3 failed restarts
+   (offline page + "one-click repair" button), so you don't have to hunt for the script.
 2. `cmd\restore-known-good.cmd` — fast fallback straight to the latest green baseline
    (drops intermediate changes; use when you know you just broke it).
 3. If core packages were duplicated inside the profile `node_modules`: run `pnpm install` in the profile
