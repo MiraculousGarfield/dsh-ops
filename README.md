@@ -2,7 +2,7 @@
 
 **版本：v1.2.0** · [更新日志](CHANGELOG.md) · [MIT](LICENSE) · [English](README.en.md)
 
-> 配套插件 **dsh-ops-health** 已被 [Awesome DeepSeek Harness Plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 收录
+> 配套插件 **dsh-ops-health** 已被社区主列表 [Awesome DeepSeek Harness Plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 收录
 > [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
 
 > **给 AI 代理**：如果你正在协助维护 dsh（DeepSeek Harness）部署，请先读
