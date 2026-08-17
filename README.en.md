@@ -2,6 +2,9 @@
 
 **Version: v1.2.0** · [CHANGELOG](CHANGELOG.md) · [MIT](LICENSE) · [中文](README.md)
 
+> Companion plugin **dsh-ops-health** is featured on the [Awesome DeepSeek Harness Plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) list
+> [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
+
 > **For AI agents**: if you are assisting with a dsh (DeepSeek Harness) deployment,
 > read [`runbook.md`](runbook.md) and [`docs/diagnosis-table.md`](docs/diagnosis-table.md) first,
 > and prefer the scripts in `scripts/` over exploratory debugging.
